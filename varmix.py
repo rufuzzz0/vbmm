@@ -13,7 +13,7 @@ from scipy.special.basic import digamma
 import time
 from viz import create_cov_ellipse
 
-ROOT = 'PATH_TO_WHERE_YOU_WANT_YOUR_ANIMATIONS_TO_BE_SAVED_TO'
+ROOT = ""  # 'PATH_TO_WHERE_YOU_WANT_YOUR_ANIMATIONS_TO_BE_SAVED_TO'
 
 def gen(K,N,XDim):
     #K: number of components
@@ -37,7 +37,7 @@ def run(X,K,VERBOSE=True):
     (N,XDim) = shape(X)
     
     #hyperparams:
-    alpha0 = 0.1 #prior coefficient count (for Dir)
+    alpha0 = 0.00001 #prior coefficient count (for Dir)
     beta0 = (1e-20)*1. #variance of mean (smaller: broader the means)
     v0 = XDim+1. #2. #degrees of freedom in inverse wishart
     m0 = zeros(XDim) #prior mean
@@ -71,13 +71,13 @@ def run(X,K,VERBOSE=True):
         Z = Zopt(XDim, pik, invc, mu, N, K) #eqn 10.46 Bishop
         
         if VERBOSE:
-            print 'itr %i'%itr
-            print 'means',m
-            print 'Z',Z
-            print 'mu',mu
-            print 'invc',invc
-            print 'exp(pik)',exp(pik)
-            print 'NK',NK
+            print(f"itr {itr}")
+            print(f"means {m}")
+            print(f"Z {Z}")
+            print(f"mu {mu}")
+            print(f"invc {invc}")
+            print(f"exp(pik) {exp(pik)}")
+            print(f"NK {NK}")
             if itr==0:
                 sctX = scatter(X[:,0],X[:,1])
                 sctZ = scatter(m[:,0],m[:,1],color='r')
@@ -151,7 +151,7 @@ def calcW(K,W0,xd,NK,m0,XDim,beta0,S):
         try:
             W.append(inv(Winv[k]))
         except linalg.linalg.LinAlgError:
-            print 'Winv[%i]'%k, Winv[k]
+            print(f"Winv {k}, {Winv[k]}")
             raise linalg.linalg.LinAlgError()
     return W
 
@@ -182,7 +182,7 @@ def Invcopt(W,vk,XDim,K):
     invc = [None for _ in range(K)]
     for k in range(K):
         dW = det(W[k])
-        print 'dW',dW
+        print(f"dW {dW}")
         if dW>1e-30: ld = log(dW)
         else: ld = 0.0
         invc[k] = sum([digamma((vk[k]+1-i) / 2.) for i in range(XDim)]) + XDim*log(2) + ld
@@ -204,6 +204,6 @@ if __name__ == "__main__":
     #run VB on the data:
     K1 = 20 # num components in inference
     mu,invc,pik,Z = run(X,K1)
-    print 'mu',mu
-    print 'NK',Z.sum(axis=0)
+    print(f"mu {mu}")
+    print(f"NK {Z.sum(axis=0)}")
     
